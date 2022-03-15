@@ -1,6 +1,6 @@
 package pkg
 
 func (s *Server) routes() {
-	s.router.HandleFunc("/health", s.newHealthHandler()).Methods("GET")
-	s.router.HandleFunc("/csv-service", s.newCSVServiceHandler()).Methods("POST")
+	s.router.Get("/health", s.newHealthHandler())
+	s.router.Post("/csv-service", s.newCSVServiceHandler())
 }

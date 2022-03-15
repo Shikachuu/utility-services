@@ -10,16 +10,16 @@ import (
 
 func (s *Server) newCSVServiceHandler() http.HandlerFunc {
 	type errorResponse struct {
-		Error error `json:"error"`
+		Error string `json:"error"`
 	}
 
-	var strResponse []string
-
 	return func(w http.ResponseWriter, r *http.Request) {
+		var strResponse []string
 		err := r.ParseMultipartForm(32 << 20)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_ = json.NewEncoder(w).Encode(errorResponse{Error: err})
+			w.Header().Add("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(errorResponse{Error: err.Error()})
 			return
 		}
 
@@ -28,7 +28,8 @@ func (s *Server) newCSVServiceHandler() http.HandlerFunc {
 		f, _, err := r.FormFile("file")
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_ = json.NewEncoder(w).Encode(errorResponse{Error: err})
+			w.Header().Add("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(errorResponse{Error: err.Error()})
 			return
 		}
 
@@ -41,14 +42,17 @@ func (s *Server) newCSVServiceHandler() http.HandlerFunc {
 		recs, err := csvReader.ReadAll()
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_ = json.NewEncoder(w).Encode(errorResponse{Error: err})
+			w.Header().Add("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(errorResponse{Error: err.Error()})
 			return
 		}
 
 		for _, rec := range recs {
+			templateStr := strCtx
 			for i, col := range rec {
-				strResponse = append(strResponse, strings.ReplaceAll(strCtx, "$"+strconv.Itoa(i), col))
+				templateStr = strings.ReplaceAll(templateStr, "$"+strconv.Itoa(i+1), col)
 			}
+			strResponse = append(strResponse, templateStr)
 		}
 
 		w.Header().Set("Content-Type", "text/plain")

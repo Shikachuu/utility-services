@@ -7,8 +7,8 @@ import (
 
 	"github.com/Shikachuu/utility-services/csv-service/internal"
 	"github.com/Shikachuu/utility-services/csv-service/pkg"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-kit/log"
-	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -24,7 +24,7 @@ func main() {
 }
 
 func run(logger log.Logger) error {
-	router := mux.NewRouter()
+	router := chi.NewRouter()
 	srv := pkg.NewServer(router, logger)
 
 	httpSrv := &http.Server{
