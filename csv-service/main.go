@@ -5,7 +5,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/Shikachuu/utility-services/csv-service/internal"
 	"github.com/Shikachuu/utility-services/csv-service/pkg"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-kit/log"
@@ -13,7 +12,7 @@ import (
 
 func main() {
 	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))
-	logger = log.With(logger, "ts", log.DefaultTimestampUTC, "commit", internal.GitCommit)
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 
 	_ = logger.Log("level", "info", "msg", "service started")
 

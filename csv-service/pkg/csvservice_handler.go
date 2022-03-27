@@ -24,14 +24,14 @@ func (s *Server) newCSVServiceHandler() http.HandlerFunc {
 		}
 
 		strCtx := r.PostFormValue("query")
-
-		f, _, err := r.FormFile("file")
+		f, fi, err := r.FormFile("file")
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Header().Add("Content-Type", "application/json")
 			_ = json.NewEncoder(w).Encode(errorResponse{Error: err.Error()})
 			return
 		}
+		defer f.Close()
 
 		csvReader := csv.NewReader(f)
 		csvReader.Comma = ';'
@@ -56,6 +56,9 @@ func (s *Server) newCSVServiceHandler() http.HandlerFunc {
 		}
 
 		w.Header().Set("Content-Type", "text/plain")
+		fileSize := strconv.Itoa(int(fi.Size)) + "byte"
+		_ = s.logger.Log("level", "info", "query_length", strconv.Itoa(len(strCtx))+"char", "filesize", fileSize)
+
 		_, _ = w.Write([]byte(strings.Join(strResponse, "\n")))
 	}
 }

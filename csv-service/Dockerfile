@@ -1,7 +1,7 @@
-FROM golang:1.17 as build
+FROM golang:1.18 as build
 COPY . /app
 WORKDIR /app
-RUN make dist && mv /app/bin/csv-service-$(dpkg --print-architecture) /app/bin/csv-service
+RUN make && mv /app/bin/csv-service-$(dpkg --print-architecture) /app/bin/csv-service
 
 FROM alpine:3.15
 RUN adduser --disabled-password --gecos "" -g app app
